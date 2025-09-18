@@ -1,0 +1,2 @@
+builder.AddAuthentication(builder.Configuration.GetSection("Authentication")) #regex:\.AddAuthentication\((?>\((?<c>)|[^()]+|\)(?<-c>))*(?(c)(?!))\)#
+       .AddBearer(builder.Configuration.GetSection("Authentication"))
