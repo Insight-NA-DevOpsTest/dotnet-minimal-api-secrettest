@@ -1,0 +1,54 @@
+
+#regex:public\sstatic\sclass\sSwaggerExtensions\s*{#
+    private static SwaggerOptions? SwaggerConfig;
+    
+
+#regex:AddSwaggerWithAuthentication\([^)]*\)\s*{#
+        SwaggerConfig = config.Get<SwaggerOptions>();
+
+
+#regex:app.UseSwaggerUI\(options\s=>\s*{#
+            if (SwaggerConfig?.ClientId != null)
+            {
+                options.OAuthClientId(SwaggerConfig.ClientId);
+            }
+
+
+#regex:services.AddSwaggerGen\(options\s=>\s*{#
+
+            if (SwaggerConfig?.ClientId != null)
+            {
+                // This configures Swagger to participate in the full authentication flow with the. Change these values to meet your needs. 
+                // See https://github.com/domaindrivendev/Swashbuckle.AspNetCore#add-security-definitions-and-requirements for implementation details and other flows. 
+
+                var authUrl = SwaggerConfig.AuthorizationUrl ?? throw new InvalidOperationException("Swagger:AuthorizationUrl is required when specifying Swagger:ClientId");
+                var authScope = SwaggerConfig.AuthScope ?? throw new InvalidOperationException("Swagger:AuthScope is required when specifying Swagger:ClientId");
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+                {
+                    Description = "Supply a client ID to complete the authentication flow within Swagger.",
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows()
+                    {
+                        Implicit = new OpenApiOAuthFlow()
+                        {
+                            AuthorizationUrl = new Uri(authUrl),
+                            Scopes = { [authScope] = "Default scope" }
+                        }
+                    }
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                                {
+                                    { new OpenApiSecurityScheme
+                                        {
+                                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" },
+                                        },
+                                        Array.Empty<string>()
+                                    }
+                                });
+
+            }
+            else
+            {
+                logger.LogInformation("Skipping swagger Bearer authentication features.");
+            }
+
