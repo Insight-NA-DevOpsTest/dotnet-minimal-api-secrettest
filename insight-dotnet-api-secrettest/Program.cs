@@ -12,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 // create basic console logging to provide visibility into configuration setup
 var logger = ObservabilityExtension.GetBasicConsoleLogger<Program>();
 builder.UseAzureAppConfiguration(logger);
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerWithAuthentication(builder.Configuration.GetSection("Swagger"), logger);
@@ -27,12 +26,12 @@ builder.Services.Configure<InsightServiceConfig>(builder.Configuration.GetSectio
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerWithOptions(builder.Configuration);
 }
-
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseRouting();
 //Enable dev-certs and local HTTPS debugging first: ``app.UseHttpsRedirection();``
