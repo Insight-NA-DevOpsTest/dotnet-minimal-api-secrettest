@@ -1,0 +1,8 @@
+  "Authentication": {   #regex:"Authentication":\s*\{((\n*\s*)*"[^"]+":\s*[^\s[{][^\n]*)*#
+    "Bearer": {
+      "Authority": "",
+      "Audience": ""
+    },
+    "AuthenticationSchemes": [ #regex:"AuthenticationSchemes":\s*\[#
+        "Bearer",
+  }   #ignore#
